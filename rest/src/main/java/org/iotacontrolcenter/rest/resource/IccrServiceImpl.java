@@ -12,7 +12,6 @@ import org.iotacontrolcenter.properties.source.PropertySource;
 import org.iotacontrolcenter.rest.delegate.Delegate;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.*;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -38,9 +37,9 @@ public class IccrServiceImpl implements IccrService {
         }
         Response.ResponseBuilder r = null;
         IccrPropertyListDto propList = new IccrPropertyListDto();
-        for(String k : propSource.getIccwLanguageKeys()) {
-            propList.addProperty(new IccrPropertyDto(k, propSource.getIccwLanguageProperty(k)));
-        }
+        propSource.getIccwLanguageKeys().forEach((k) ->
+            propList.addProperty(new IccrPropertyDto(k, propSource.getIccwLanguageProperty(k)))
+        );
         r = Response.status(HttpURLConnection.HTTP_OK);
         r.entity(propList);
         return r.build();
@@ -61,9 +60,9 @@ public class IccrServiceImpl implements IccrService {
 
         IccrPropertyListDto propList = new IccrPropertyListDto();
         Properties props = propSource.getIccwLanguageProperties(key);
-        for(Object k : props.keySet()) {
-            propList.addProperty(new IccrPropertyDto((String)k, props.getProperty((String)k)));
-        }
+        props.keySet().forEach((k) ->
+            propList.addProperty(new IccrPropertyDto((String)k, props.getProperty((String)k)))
+        );
         r = Response.status(HttpURLConnection.HTTP_OK);
         r.entity(propList);
         return r.build();
@@ -122,10 +121,9 @@ public class IccrServiceImpl implements IccrService {
         Response.ResponseBuilder r = Response.status(HttpURLConnection.HTTP_OK);
 
         IccrPropertyListDto propList = new IccrPropertyListDto();
-
-        for(String key : propSource.getPropertyKeys()) {
-            propList.addProperty(new IccrPropertyDto(key, propSource.getString(key)));
-        }
+        propSource.getPropertyKeys().forEach((key) ->
+            propList.addProperty(new IccrPropertyDto(key, propSource.getString(key)))
+        );
         r.entity(propList);
         return r.build();
     }
@@ -188,11 +186,11 @@ public class IccrServiceImpl implements IccrService {
         System.out.println("updateConfigProperties");
 
         try {
-            for(IccrPropertyDto prop : properties.getProperties()) {
+            properties.getProperties().forEach((prop) -> {
                 System.out.println(prop.getKey() + " -> " + prop.getValue());
                 propSource.setProperty(prop.getKey(), prop.getValue());
                 delegate.iccrPropSet(prop.getKey());
-            }
+            });
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
         }
